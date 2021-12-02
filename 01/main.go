@@ -30,14 +30,21 @@ func main() {
 
 func countLargerThanPrevious(vals []int) int {
 	var count int
-	var last int = vals[0]
-	for i := 1; i < len(vals); i++ {
-		if vals[i] <= last {
-			last = vals[i]
-			continue
+	var topWindow int = vals[0] + vals[1] + vals[2]
+
+	// top window = A,B,C
+	//
+	// On each check
+	// W2 = W1 - v[i-3] + v[i]
+	// if W2 > W1 count++
+	// W1 = W2
+
+	for i := 3; i < len(vals); i++ {
+		bottomWindow := topWindow - vals[i-3] + vals[i]
+		if bottomWindow > topWindow {
+			count++
 		}
-		count++
-		last = vals[i]
+		topWindow = bottomWindow
 	}
 	return count
 }
