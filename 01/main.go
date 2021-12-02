@@ -33,6 +33,7 @@ func countLargerThanPrevious(vals []int) int {
 	var last int = vals[0]
 	for i := 1; i < len(vals); i++ {
 		if vals[i] <= last {
+			last = vals[i]
 			continue
 		}
 		count++
