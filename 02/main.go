@@ -39,14 +39,16 @@ func main() {
 }
 
 func getPosFromCommands(vals []command) (horizontalPos int, depth int) {
+	aim := 0
 	for _, c := range vals {
 		switch c.bearing {
 		case "forward":
 			horizontalPos += c.distance
+			depth += aim * c.distance
 		case "down":
-			depth += c.distance
+			aim += c.distance
 		case "up":
-			depth -= c.distance
+			aim -= c.distance
 		default:
 			fmt.Println("what da fuk", c.bearing)
 		}
