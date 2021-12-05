@@ -13,6 +13,56 @@ var input string
 //go:embed inputBoards.txt
 var inputBoards string
 
+// Board contains the board 2d array and also a map of seen numbers.
+type Board struct {
+	boardArr    [][]int
+	seenNumbers map[int]struct{}
+}
+
+// checkBoard checks whether the board has won.
+// The board is a 5x5 grid so that makes things a bit easier?
+func (b *Board) checkBoard() bool {
+	nHoriz := 0
+	nVer := 0
+
+	const size = 5
+
+	// horiz: i == horiz, j == ver
+	// ver: i == ver, j == horiz
+	for i := 0; i < len(b.boardArr); i++ {
+		nHoriz = 0
+		nVer = 0
+		for j := 0; j < len(b.boardArr[i]); j++ {
+			if _, ok := b.seenNumbers[b.boardArr[i][j]]; ok {
+				nHoriz++
+				nVer++
+			}
+		}
+		if nHoriz == size || nVer == size {
+			return true
+		}
+	}
+
+	return false
+}
+
+// markBoard just marks the board number as seen.
+func (b *Board) markBoard(n int) {
+	b.seenNumbers[n] = struct{}{}
+}
+
+// markBoard just marks the board number as seen.
+func (b *Board) sumOfUnmarked() (sum int) {
+	for i := 0; i < len(b.boardArr); i++ {
+		for j := 0; j < len(b.boardArr[i]); j++ {
+			if _, ok := b.seenNumbers[b.boardArr[i][j]]; !ok {
+				sum += b.boardArr[i][j]
+			}
+		}
+	}
+	return sum
+}
+
 func main() {
 	if input == "" {
 		panic("input cannot be empty")
@@ -32,20 +82,17 @@ func main() {
 
 	fmt.Println(inputarr)
 
-	boards := [][][]int{}
-
-	// string: " 3 15  0  2 22"
-	// int: 1
-	// float/real: 2.3
-	// bool: true/false
-	// arrays: [type, type]
+	boards := []*Board{}
 
 	boardsstrarr := strings.Split(inputBoards, "\n")
 
 	board := [][]int{}
 	for _, line := range boardsstrarr {
 		if line == "" {
-			boards = append(boards, board)
+			boards = append(boards, &Board{
+				boardArr:    board,
+				seenNumbers: map[int]struct{}{},
+			})
 			board = [][]int{}
 			continue
 		}
@@ -65,8 +112,20 @@ func main() {
 		board = append(board, boardline)
 	}
 
-	fmt.Println(boards)
+	answer := ifMusicBeTheFoodOfLovePlayOn(boards, inputarr)
+	fmt.Printf("Winner: %d\n", answer)
+}
 
-	// ox, co2 := getShit(inputstrarr)
-	// fmt.Printf("Answer: %d\n", ox*co2)
+// ifMusicBeTheFoodOfLovePlayOn returns the sum of all unmarked numbers on the winning board times the winning number.
+func ifMusicBeTheFoodOfLovePlayOn(boards []*Board, numbers []int) int {
+	for _, call := range numbers {
+		for _, board := range boards {
+			board.markBoard(call)
+			if board.checkBoard() {
+				fmt.Printf("Found winning board! %v\n", board.boardArr)
+				return call * board.sumOfUnmarked()
+			}
+		}
+	}
+	return 0
 }
