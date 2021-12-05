@@ -35,6 +35,8 @@ func (b *Board) checkBoard() bool {
 		for j := 0; j < len(b.boardArr[i]); j++ {
 			if _, ok := b.seenNumbers[b.boardArr[i][j]]; ok {
 				nHoriz++
+			}
+			if _, ok := b.seenNumbers[b.boardArr[j][i]]; ok {
 				nVer++
 			}
 		}
