@@ -16,49 +16,79 @@ func main() {
 	}
 	inputstrarr := strings.Split(input, "\n")
 
-	gamma, epsilon := getShit(inputstrarr)
-	fmt.Printf("Answer: %d\n", gamma*epsilon)
+	ox, co2 := getShit(inputstrarr)
+	fmt.Printf("Answer: %d\n", ox*co2)
 }
 
-func getShit(vals []string) (gamma int, epsilon int) {
-	// This loops over the length of each binary
-	gammaBin := ""
-	epsilonBin := ""
+func getShit(vals []string) (ox int, co2 int) {
+	// This function should call getVal for oxygen number (most common bitwise)
+	// And for the co2 number (least common bitwise)
+	// Then return both
+
+	oxBin := getVal(vals, true)
+	co2bin := getVal(vals, false)
+
+	fmt.Println(oxBin)
+	oxInt, err := strconv.ParseInt(oxBin, 2, 32)
+	if err != nil {
+		panic(err)
+	}
+	ox = int(oxInt)
+
+	fmt.Println(co2bin)
+	co2Int, err := strconv.ParseInt(co2bin, 2, 32)
+	if err != nil {
+		panic(err)
+	}
+	co2 = int(co2Int)
+
+	return ox, co2
+}
+
+// gelVal gets a value based on the most common bit selector, or least common if false.
+func getVal(vals []string, mostCommon bool) string {
 	for i := 0; i < len(vals[0]); i++ {
+		if len(vals) == 1 {
+			return vals[0]
+		}
+
 		// This loops over all values in the vals array.
-		count1 := 0
-		count0 := 0
+		filtered1 := []string{}
+		filtered0 := []string{}
 		for a := 0; a < len(vals); a++ {
 			switch string(vals[a][i]) {
 			case "1":
-				count1++
+				filtered1 = append(filtered1, vals[a])
 			case "0":
-				count0++
+				filtered0 = append(filtered0, vals[a])
 			}
 		}
 
-		if count0 > count1 {
-			gammaBin = gammaBin + "0"
-			epsilonBin = epsilonBin + "1"
+		if mostCommon {
+			if len(filtered1) > len(filtered0) {
+				vals = filtered1
+				continue
+			}
+			if len(filtered0) > len(filtered1) {
+				vals = filtered0
+				continue
+			}
+			// if equal, return 1?
+			vals = filtered1
+			continue
 		} else {
-			gammaBin = gammaBin + "1"
-			epsilonBin = epsilonBin + "0"
+			if len(filtered1) < len(filtered0) {
+				vals = filtered1
+				continue
+			}
+			if len(filtered0) < len(filtered1) {
+				vals = filtered0
+				continue
+			}
+			// if equal, return 0?
+			vals = filtered0
+			continue
 		}
 	}
-
-	fmt.Println(gammaBin)
-	gammaInt, err := strconv.ParseInt(gammaBin, 2, 32)
-	if err != nil {
-		panic(err)
-	}
-	gamma = int(gammaInt)
-
-	fmt.Println(epsilonBin)
-	epsilonInt, err := strconv.ParseInt(epsilonBin, 2, 32)
-	if err != nil {
-		panic(err)
-	}
-	epsilon = int(epsilonInt)
-
-	return gamma, epsilon
+	return vals[0]
 }
