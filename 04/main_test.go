@@ -46,4 +46,43 @@ func TestBoard(t *testing.T) {
 			t.Error("Should be true")
 		}
 	})
+
+	t.Run("horizontal random row", func(t *testing.T) {
+		board.seenNumbers = map[int]struct{}{
+			11: struct{}{},
+			12: struct{}{},
+			13: struct{}{},
+			14: struct{}{},
+			15: struct{}{},
+		}
+		if !board.checkBoard() {
+			t.Error("Should be true")
+		}
+	})
+
+	t.Run("horizontal last row", func(t *testing.T) {
+		board.seenNumbers = map[int]struct{}{
+			21: struct{}{},
+			22: struct{}{},
+			23: struct{}{},
+			24: struct{}{},
+			25: struct{}{},
+		}
+		if !board.checkBoard() {
+			t.Error("Should be true")
+		}
+	})
+
+	t.Run("vertical last row", func(t *testing.T) {
+		board.seenNumbers = map[int]struct{}{
+			5:  struct{}{},
+			10: struct{}{},
+			15: struct{}{},
+			20: struct{}{},
+			25: struct{}{},
+		}
+		if !board.checkBoard() {
+			t.Error("Should be true")
+		}
+	})
 }

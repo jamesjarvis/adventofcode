@@ -22,6 +22,8 @@ type Board struct {
 // checkBoard checks whether the board has won.
 // The board is a 5x5 grid so that makes things a bit easier?
 func (b *Board) checkBoard() bool {
+	fmt.Printf("%s\n", b.seenNumbers)
+
 	nHoriz := 0
 	nVer := 0
 
@@ -120,14 +122,30 @@ func main() {
 
 // ifMusicBeTheFoodOfLovePlayOn returns the sum of all unmarked numbers on the winning board times the winning number.
 func ifMusicBeTheFoodOfLovePlayOn(boards []*Board, numbers []int) int {
+	var lastWinningBoard *Board
+	var lastWinningNumber int
 	for _, call := range numbers {
-		for _, board := range boards {
+		fmt.Printf("new call %d\n", call)
+		for bi := 0; bi < len(boards); bi++ {
+			board := boards[bi]
 			board.markBoard(call)
 			if board.checkBoard() {
-				fmt.Printf("Found winning board! %v\n", board.boardArr)
-				return call * board.sumOfUnmarked()
+				lastWinningBoard = board
+				lastWinningNumber = call
+				fmt.Printf("reached here, bi=%d, len=%d\n", bi, len(boards))
+				if bi <= len(boards) {
+					fmt.Println("reached even here")
+					boards = append(boards[:bi], boards[bi+1:]...)
+					bi = bi - 1
+				}
+				fmt.Printf("Found winning board! Removed from list %v\n", board.boardArr)
+				fmt.Printf("new reached here here, bi=%d, len=%d\n", bi, len(boards))
+				fmt.Printf("bi: %d, length of boards remaining: %d\n", bi, len(boards))
+				if len(boards) == 0 {
+					return lastWinningNumber * lastWinningBoard.sumOfUnmarked()
+				}
 			}
 		}
 	}
-	return 0
+	return lastWinningNumber * lastWinningBoard.sumOfUnmarked()
 }
