@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 )
 
 //go:embed input.txt
 var input string
 
-const simulateNDays = 80
+const simulateNDays = 256
 const eachFishReplicatesEveryNDays = 7
 
 func main() {
@@ -32,9 +31,9 @@ func main() {
 	}
 
 	for i := 0; i < simulateNDays; i++ {
-		now := time.Now()
+		// now := time.Now()
 		world.Tick()
-		fmt.Printf("Step %d, %d fish, took %s\n", i, world.Size(), time.Since(now))
+		// fmt.Printf("Step %d, %d fish, took %s\n", i, world.Size(), time.Since(now))
 	}
 
 	numberOfFish := world.Size()
@@ -57,14 +56,14 @@ func (w *World) Size() int {
 }
 
 func (w *World) Tick() {
-	fmt.Println("Number of fish before:", w.Size())
+	// fmt.Println("Number of fish before:", w.Size())
 	resetFish := w.feesh[0]
-	fmt.Println("Fish to reset:", resetFish)
+	// fmt.Println("Fish to reset:", resetFish)
 	for day := 0; day < eachFishReplicatesEveryNDays-1; day++ {
 		w.feesh[day] = w.feesh[day+1]
 	}
 	w.feesh[eachFishReplicatesEveryNDays-1] = w.feesh[eachFishReplicatesEveryNDays] + resetFish
 	w.feesh[eachFishReplicatesEveryNDays] = w.feesh[eachFishReplicatesEveryNDays+1]
 	w.feesh[eachFishReplicatesEveryNDays+1] = resetFish
-	fmt.Println("Number of fish after:", w.Size())
+	// fmt.Println("Number of fish after:", w.Size())
 }
