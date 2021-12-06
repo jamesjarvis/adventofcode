@@ -68,13 +68,7 @@ type Board struct {
 }
 
 func (b *Board) Ingest(l Line) {
-	if !l.IsHorizontal() && !l.IsVertical() {
-		// We don't care about horizontal or vertical atm.
-		return
-	}
-
-	// This is only horizontal and vertical for now, so we just want to walk around
-	// and fill in the counts at each coordinate the line crosses.
+	// Since we are only ever moving at 45 degree angles, this should be fine...
 
 	var dx, dy int
 	if l.Start.X < l.End.X {
