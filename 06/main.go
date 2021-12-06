@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //go:embed input.txt
 var input string
 
-const simulateNDays = 80
+const simulateNDays = 256
 const eachFishReplicatesEveryNDays = 7
 
 func main() {
@@ -31,7 +32,9 @@ func main() {
 	}
 
 	for i := 0; i < simulateNDays; i++ {
+		now := time.Now()
 		world.Tick()
+		fmt.Printf("Step %d, %d fish, took %s\n", i, world.Size(), time.Since(now))
 	}
 
 	numberOfFish := world.Size()
