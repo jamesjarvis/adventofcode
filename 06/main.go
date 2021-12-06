@@ -11,7 +11,7 @@ import (
 //go:embed input.txt
 var input string
 
-const simulateNDays = 256
+const simulateNDays = 80
 const eachFishReplicatesEveryNDays = 7
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	}
 	inputstrarr := strings.Split(input, ",")
 	world := &World{
-		feesh: []*Lanternfish{},
+		feesh: [eachFishReplicatesEveryNDays + 2]int{},
 	}
 	for _, val := range inputstrarr {
 		n, err := strconv.Atoi(val)
@@ -28,7 +28,7 @@ func main() {
 			panic(err)
 		}
 
-		world.feesh = append(world.feesh, &Lanternfish{internaltimer: n})
+		world.feesh[n] = world.feesh[n] + 1
 	}
 
 	for i := 0; i < simulateNDays; i++ {
@@ -41,35 +41,30 @@ func main() {
 	fmt.Printf("Answer: %d\n", numberOfFish)
 }
 
-type World struct {
-	feesh []*Lanternfish
+// Represent fish lifetimes as an array of number of fish of length eachFishReplicatesEveryNDays + 2,
+// where the index of each element contains the count of fish at that age.
 
-	day int
+type World struct {
+	feesh [eachFishReplicatesEveryNDays + 2]int
 }
 
-func (w *World) Size() int { return len(w.feesh) }
+func (w *World) Size() int {
+	count := 0
+	for _, numFish := range w.feesh {
+		count += numFish
+	}
+	return count
+}
 
 func (w *World) Tick() {
-	newFeeshToAdd := []*Lanternfish{}
-	for _, lf := range w.feesh {
-		newFeesh := lf.Tick()
-		if newFeesh != nil {
-			newFeeshToAdd = append(newFeeshToAdd, newFeesh)
-		}
+	fmt.Println("Number of fish before:", w.Size())
+	resetFish := w.feesh[0]
+	fmt.Println("Fish to reset:", resetFish)
+	for day := 0; day < eachFishReplicatesEveryNDays-1; day++ {
+		w.feesh[day] = w.feesh[day+1]
 	}
-	w.feesh = append(w.feesh, newFeeshToAdd...)
-	w.day++
-}
-
-type Lanternfish struct {
-	internaltimer int
-}
-
-func (lf *Lanternfish) Tick() *Lanternfish {
-	if lf.internaltimer == 0 {
-		lf.internaltimer = eachFishReplicatesEveryNDays - 1
-		return &Lanternfish{eachFishReplicatesEveryNDays + 1}
-	}
-	lf.internaltimer = lf.internaltimer - 1
-	return nil
+	w.feesh[eachFishReplicatesEveryNDays-1] = w.feesh[eachFishReplicatesEveryNDays] + resetFish
+	w.feesh[eachFishReplicatesEveryNDays] = w.feesh[eachFishReplicatesEveryNDays+1]
+	w.feesh[eachFishReplicatesEveryNDays+1] = resetFish
+	fmt.Println("Number of fish after:", w.Size())
 }
