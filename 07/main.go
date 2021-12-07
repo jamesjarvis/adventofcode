@@ -65,13 +65,20 @@ func (w *World) IdealFuelRequired() (fuel int) {
 	return w.amountOfFuelRequired
 }
 
+// Now fuel required goes 1,3,6,10,15
 func (w *World) FuelRequired(pos int) (fuel int) {
 	for _, c := range w.crabs {
 		if c < pos {
-			fuel += (pos - c)
+			fuel += triangularNumber(pos - c)
 		} else {
-			fuel += (c - pos)
+			fuel += triangularNumber(c - pos)
 		}
 	}
 	return fuel
+}
+
+// triangularNumber returns the amount of fuel required to reach a positional difference
+// based on the pattern 1,3,6,10,15....
+func triangularNumber(n int) int {
+	return (n * (n + 1)) / 2
 }
