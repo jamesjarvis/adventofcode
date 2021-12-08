@@ -114,11 +114,21 @@ func main() {
 	}
 
 	HowManyTimesDoDigitsAppear := world.HowManyTimesDoDigitsAppear(digitsUnderTest)
-	fmt.Printf("Answer: %d\n", HowManyTimesDoDigitsAppear)
+	fmt.Printf("How many times digits appear: %d\n", HowManyTimesDoDigitsAppear)
+
+	sumOutputs := world.SumOutputValues()
+	fmt.Printf("Sum of output values: %d\n", sumOutputs)
 }
 
 type World struct {
 	problems []*Problem
+}
+
+func (w *World) SumOutputValues() (sum int) {
+	for _, p := range w.problems {
+		sum += p.WhatIsOutputValue()
+	}
+	return sum
 }
 
 func (w *World) HowManyTimesDoDigitsAppear(digits map[int]struct{}) (count int) {
@@ -146,12 +156,16 @@ type Problem struct {
 
 func (p *Problem) Komput() {
 	length6digs := [][]string{}
+	length5digs := [][]string{}
 	for _, segment := range p.segmentValues {
 		// simple cases out of the way first, 1,4,7,8
 		val := p.WhatIsSegmentValue(segment)
 		if val == -1 {
 			if len(segment) == 6 {
 				length6digs = append(length6digs, segment)
+			}
+			if len(segment) == 5 {
+				length5digs = append(length5digs, segment)
 			}
 			continue
 		}
@@ -189,6 +203,38 @@ func (p *Problem) Komput() {
 			length6digs = nil
 		}
 	}
+
+	// find digits of length 5 now...
+	for {
+		if len(length5digs) == 0 {
+			// yay we found them all.
+			break
+		}
+
+		// if we have a diff of 1 between segment 6 and this segment, this segment is 5.
+		for i, val := range length5digs {
+			if diff(p.foundValues[6], val) == 1 {
+				p.foundValues[5] = val
+				length5digs = append(length5digs[:i], length5digs[i+1:]...)
+				break
+			}
+		}
+
+		// if we have a diff of 1 between segment 9 and this segment, this segment is 3.
+		for i, val := range length5digs {
+			if diff(p.foundValues[9], val) == 1 {
+				p.foundValues[3] = val
+				length5digs = append(length5digs[:i], length5digs[i+1:]...)
+				break
+			}
+		}
+
+		// the last one must be 2...
+		if len(length5digs) == 1 {
+			p.foundValues[2] = length5digs[0]
+			length5digs = nil
+		}
+	}
 }
 
 // diff returns the number of digits from a but not in b.
@@ -214,6 +260,14 @@ func contains(s []string, char string) bool {
 		}
 	}
 	return false
+}
+
+func (p *Problem) WhatIsOutputValue() (outputVal int) {
+	for _, testVal := range p.testValues {
+		val := p.WhatIsSegmentValue(testVal)
+		outputVal = (outputVal * 10) + val
+	}
+	return outputVal
 }
 
 // returns segment value, or -1 if not known yet.
